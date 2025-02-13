@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from flask import Flask, make_response, request
+=======
+from flask import Flask, make_response
+>>>>>>> 6afa1ab (added screenshot of curl and flask container running)
 import os
 
 app = Flask(__name__)
@@ -35,4 +39,8 @@ if __name__ == '__main__':
     # Set this to '0.0.0.0' to make it accessible from any IP address
     # on your network (not recommended for production use)
    # app.run(port=5002)
+<<<<<<< HEAD
     app.run(host="0.0.0.0", port=5002, threaded=False)
+=======
+    app.run(host="0.0.0.0", port=5002)
+>>>>>>> 6afa1ab (added screenshot of curl and flask container running)

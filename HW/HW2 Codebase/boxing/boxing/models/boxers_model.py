@@ -119,6 +119,19 @@ def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
 
 
 def get_boxer_by_id(boxer_id: int) -> Boxer:
+    """Retrieves a boxer from the catalog by their boxer ID.
+
+    Args:
+        boxer_id (int): The ID of the boxer to retrieve.
+
+    Returns:
+        Boxer: The Boxer object corresponding to the boxer_id.
+
+    Raises:
+        ValueError: If the boxer is not found.
+        sqlite3.Error: If any database error occurs.
+
+    """
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -143,6 +156,19 @@ def get_boxer_by_id(boxer_id: int) -> Boxer:
 
 
 def get_boxer_by_name(boxer_name: str) -> Boxer:
+    """Retrieves a boxer from the catalog by their name.
+
+    Args:
+        boxer_name (str): The name of the boxer to retrieve.
+
+    Returns:
+        Boxer: The Boxer object corresponding to the boxer_name.
+
+    Raises:
+        ValueError: If the boxer is not found.
+        sqlite3.Error: If any database error occurs.
+
+    """
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -167,6 +193,18 @@ def get_boxer_by_name(boxer_name: str) -> Boxer:
 
 
 def get_weight_class(weight: int) -> str:
+    """Retrieves the weight class of a weight.
+
+    Args:
+        weight (int): The weight to determine wweight class of.
+
+    Returns:
+        str: The weight class of the weight.
+
+    Raises:
+        ValueError: If the weight is too small.
+
+    """
     if weight >= 203:
         weight_class = 'HEAVYWEIGHT'
     elif weight >= 166:
@@ -182,6 +220,17 @@ def get_weight_class(weight: int) -> str:
 
 
 def update_boxer_stats(boxer_id: int, result: str) -> None:
+    """Updates the statisticsnumber of fights ans wins of a boxer by boxer ID.
+
+    Args:
+        boxer_id (str): The ID of the boxer to update about.
+        result (str): The result of the fight in 'win' or 'loss'.
+
+    Raises:
+        ValueError: If the result is not in 'win' or 'loss' or if the boxer is not found.
+        sqlite3.Error: If any database error occurs.
+
+    """
     if result not in {'win', 'loss'}:
         raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
 

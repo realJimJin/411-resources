@@ -46,11 +46,30 @@ class RingModel:
         return winner.name
 
     def clear_ring(self):
+        """Clears all boxers from the ring.
+
+        Clears all boxers from the ring.
+        
+        To Do:
+            If the ring is already empty, logs a warning. 
+            Take example of clear_playlist().
+
+        """
         if not self.ring:
             return
         self.ring.clear()
 
     def enter_ring(self, boxer: Boxer):
+        """Adds a boxer to the ring.
+
+        Args:
+            boxer (Boxer): The boxer to enter the ring.
+
+        Raises:
+            TypeError: If the boxer is not a valid Boxer instance.
+            ValueError: If the ring is already full.
+
+        """
         if not isinstance(boxer, Boxer):
             raise TypeError(f"Invalid type: Expected 'Boxer', got '{type(boxer).__name__}'")
 
@@ -60,6 +79,19 @@ class RingModel:
         self.ring.append(boxer)
 
     def get_boxers(self) -> List[Boxer]:
+        """Returns a list of all boxers currently in the ring.
+
+        Returns:
+            List[Song]: A list of all boxers currently in the ring.
+
+        Raises:
+            ValueError: If the ring is empty.
+
+        To Do:
+            Testing for ValueError and log a warning when error occured. 
+            Take example of get_all_songs().
+
+        """
         if not self.ring:
             pass
         else:
@@ -68,6 +100,12 @@ class RingModel:
         return self.ring
 
     def get_fighting_skill(self, boxer: Boxer) -> float:
+        """Returns the quantifled skill value of boxer.
+
+        Returns:
+            float: The the quantifled skill value of boxer.
+
+        """
         # Arbitrary calculations
         age_modifier = -1 if boxer.age < 25 else (-2 if boxer.age > 35 else 0)
         skill = (boxer.weight * len(boxer.name)) + (boxer.reach / 10) + age_modifier

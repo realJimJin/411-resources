@@ -14,6 +14,19 @@ RANDOM_ORG_URL = os.getenv("RANDOM_ORG_URL",
 
 
 def get_random() -> float:
+    """
+    Fetches a random integer from random.org.
+
+    Raises:
+        RuntimeError: If the request to random.org fails.
+        ValueError: If the response from random.org is not a valid float.
+
+    To Do:
+        Log a warning when error occured. 
+        Log info when fetching and recieving random number.
+        Take example of get_random().
+
+    """
     try:
         response = requests.get(RANDOM_ORG_URL, timeout=5)
 

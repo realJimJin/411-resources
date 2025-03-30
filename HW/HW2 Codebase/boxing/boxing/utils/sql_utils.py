@@ -21,13 +21,10 @@ def check_database_connection():
     Raises:
         Exception: If the database connection is not OK.
 
-    To Do:
-        Log a warning when error occured. 
-        Log info when testing database connection.
-        Take example of check_database_connection().
-
     """
     try:
+        logger.info(f"Checking database connection to {DB_PATH}...")
+
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
@@ -35,8 +32,11 @@ def check_database_connection():
         cursor.execute("SELECT 1;")
         conn.close()
 
+        logger.info("Database connection is healthy.")
+
     except sqlite3.Error as e:
         error_message = f"Database connection error: {e}"
+        logger.error(error_message)
         raise Exception(error_message) from e
 
 def check_table_exists(tablename: str):
@@ -48,15 +48,10 @@ def check_table_exists(tablename: str):
 
     Raises:
         Exception: If the table does not exist.
-    
-    To Do:
-        Log info when Checking table existance.
-        Log a warning when error occured. 
-        Log a confirmation when exist.
-        Take example of check_table_exists().
 
     """
     try:
+        logger.info(f"Checking if table '{tablename}' exists in {DB_PATH}...")
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -69,10 +64,12 @@ def check_table_exists(tablename: str):
 
         if result is None:
             error_message = f"Table '{tablename}' does not exist."
+            logger.error(error_message)
             raise Exception(error_message)
 
     except sqlite3.Error as e:
         error_message = f"Table check error for '{tablename}': {e}"
+        logger.error(error_message)
         raise Exception(error_message) from e
 
 @contextmanager
@@ -84,19 +81,17 @@ def get_db_connection():
 
     Raises:
         sqlite3.Error: If there is an issue connecting to the database.
-    
-    To Do:
-        Log info when openning and closing database connection.
-        Log a warning when error occured. 
-        Take example of get_db_connection().
 
     """
     conn = None
     try:
+        logger.info(f"Opening database connection to {DB_PATH}...")
         conn = sqlite3.connect(DB_PATH)
         yield conn
     except sqlite3.Error as e:
+        logger.error(f"Database connection error: {e}")
         raise e
     finally:
         if conn:
             conn.close()
+            logger.info("Database connection closed.")

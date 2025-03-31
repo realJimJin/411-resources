@@ -27,6 +27,24 @@ class Boxer:
 
 def create_boxer(name: str, weight: int, height: int, reach: float, age: int) -> None:
 
+ """creates a boxer in the catalog based on the Args.
+ 
+     Args:
+ 
+         name (str): The name of the boxer being created
+	 weight (int): The weight of the boxer being created
+	 height (int): The height of the boxer being created
+	 reach (float): The reach of the boxer being created
+	 age (int): The age of the boxer being created 
+ 
+     Returns:
+         None: Nothing
+ 
+     Raises:
+         ValueError: If the boxer with the same name already exists.
+         sqlite3.Error: If any database error occurs.
+ 
+     """
     if weight < 125:
         raise ValueError(f"Invalid weight: {weight}. Must be at least 125.")
     if height <= 0:
@@ -60,6 +78,20 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
 
 
 def delete_boxer(boxer_id: int) -> None:
+
+ """Deletes a boxer from the catalog by their boxer ID.
+ 
+     Args:
+         boxer_id (int): The ID of the boxer to delete.
+ 
+     Returns:
+         None: nothing.
+ 
+     Raises:
+         ValueError: If the boxer is not found.
+         sqlite3.Error: If any database error occurs.
+ 
+     """
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -76,6 +108,20 @@ def delete_boxer(boxer_id: int) -> None:
 
 
 def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
+
+ """Retrieves the leaderboard
+ 
+     Args:
+         sort_by (string): The attributes of comparison for the leaderboard, it is by default set to the number of wins.
+ 
+     Returns:
+         List: A List of boxer objects.
+ 
+     Raises:
+         ValueError: If the sort_by parameter is invalid.
+         sqlite3.Error: If any database error occurs.
+ 
+     """
     query = """
         SELECT id, name, weight, height, reach, age, fights, wins,
                (wins * 1.0 / fights) AS win_pct

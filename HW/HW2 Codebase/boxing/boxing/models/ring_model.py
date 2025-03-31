@@ -19,6 +19,7 @@ class RingModel:
         ring (List[Boxer]): The list of boxers in the ring.
 
     """
+
     def __init__(self):
         """Initializes the RingModel with an empty ring.
 
@@ -33,7 +34,7 @@ class RingModel:
             self (Boxer): The boxer initiating the fight.
 
         Returns: 
-	        name of the winner (str)
+            name of the winner (str)
 
         Raises:
             ValueError: If there are less than two boxers in the ring.
@@ -42,6 +43,7 @@ class RingModel:
         """
 
         if len(self.ring) < 2:
+            logger.error(f"There must be two boxers to start a fight.")
             raise ValueError("There must be two boxers to start a fight.")
 
         boxer_1, boxer_2 = self.get_boxers()
@@ -71,17 +73,13 @@ class RingModel:
         return winner.name
 
     def clear_ring(self):
-        """Clears all boxers from the ring.
-
-        Clears all boxers from the ring.
-        
-        To Do:
-            If the ring is already empty, logs a warning. 
-            Take example of clear_playlist().
+        """Clears all boxers from the ring. If the ring is already empty, logs a warning.
 
         """
         if not self.ring:
-            return
+            logger.error("Ring is empty")
+            raise ValueError("Ring is empty")
+        
         self.ring.clear()
 
     def enter_ring(self, boxer: Boxer):
@@ -96,12 +94,16 @@ class RingModel:
 
         """
         if not isinstance(boxer, Boxer):
+            logger.error("Invalid type: Boxer is not a valid Boxer instance")
             raise TypeError(f"Invalid type: Expected 'Boxer', got '{type(boxer).__name__}'")
 
         if len(self.ring) >= 2:
+            logger.error(f"Ring is full, cannot add more boxers.")
             raise ValueError("Ring is full, cannot add more boxers.")
 
         self.ring.append(boxer)
+        logger.info(f"Successfully added boxer to ring: {boxer.name} ")
+
 
     def get_boxers(self) -> List[Boxer]:
         """Returns a list of all boxers currently in the ring.
@@ -112,17 +114,13 @@ class RingModel:
         Raises:
             ValueError: If the ring is empty.
 
-        To Do:
-            Testing for ValueError and log a warning when error occured. 
-            Take example of get_all_songs().
-
         """
         if not self.ring:
-            logger.error(f"The ring is empty")
-            raise ValueError(f"The ring is empty")
-
+            logger.error("Ring is empty")
+            raise ValueError("Ring is empty")
+            
         else:
-            pass
+            logger.info("Retrieving all boxers in the ring")
 
         return self.ring
 
@@ -136,5 +134,7 @@ class RingModel:
         # Arbitrary calculations
         age_modifier = -1 if boxer.age < 25 else (-2 if boxer.age > 35 else 0)
         skill = (boxer.weight * len(boxer.name)) + (boxer.reach / 10) + age_modifier
+        logger.info(f"Retrieving fighting skill for boxer: {skill} ")
+
 
         return skill

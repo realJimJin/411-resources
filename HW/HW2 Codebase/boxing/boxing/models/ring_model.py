@@ -16,6 +16,21 @@ class RingModel:
         self.ring: List[Boxer] = []
 
     def fight(self) -> str:
+
+  """compute outcome of a fight between two boxers.
+
+        Args:
+            self (Boxer): The boxer initiating the fight.
+
+        Returns: 
+	   name of the winner (str)
+
+        Raises:
+            ValueError: If there are less than two boxers in the ring.
+     
+
+        """
+
         if len(self.ring) < 2:
             raise ValueError("There must be two boxers to start a fight.")
 

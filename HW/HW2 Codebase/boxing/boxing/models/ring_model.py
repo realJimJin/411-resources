@@ -12,18 +12,28 @@ configure_logger(logger)
 
 
 class RingModel:
+    """
+    A class to manage a ring with boxers.
+
+    Attributes:
+        ring (List[Boxer]): The list of boxers in the ring.
+
+    """
     def __init__(self):
+        """Initializes the RingModel with an empty ring.
+
+        """
         self.ring: List[Boxer] = []
 
     def fight(self) -> str:
 
-  """compute outcome of a fight between two boxers.
+        """compute outcome of a fight between two boxers.
 
         Args:
             self (Boxer): The boxer initiating the fight.
 
         Returns: 
-	   name of the winner (str)
+	        name of the winner (str)
 
         Raises:
             ValueError: If there are less than two boxers in the ring.
@@ -97,7 +107,7 @@ class RingModel:
         """Returns a list of all boxers currently in the ring.
 
         Returns:
-            List[Song]: A list of all boxers currently in the ring.
+            List[Boxer]: A list of all boxers currently in the ring.
 
         Raises:
             ValueError: If the ring is empty.
@@ -108,7 +118,9 @@ class RingModel:
 
         """
         if not self.ring:
-            pass
+            logger.error(f"The ring is empty")
+            raise ValueError(f"The ring is empty")
+
         else:
             pass
 

@@ -13,66 +13,63 @@ done
 
 check_health() {
   echo "Checking health..."
-  curl -s "$BASE_URL/health" | grep -q '"status": "success"'
+  curl -s -X GET "$BASE_URL/health" | grep -q '"status": "success"'
   if [ $? -eq 0 ]; then
     echo "Service is healthy."
   else
-    echo "Health check failed."; exit 1
+    echo "Health check failed."
+    exit 1
   fi
 }
 
 check_db() {
   echo "Checking DB connection..."
-  curl -s "$BASE_URL/db-check" | grep -q '"status": "success"'
+  curl -s -X GET "$BASE_URL/db-check" | grep -q '"status": "success"'
   if [ $? -eq 0 ]; then
     echo "Database is healthy."
   else
-    echo "Database check failed."; exit 1
+    echo "Database check failed."
+    exit 1
   fi
 }
 
 create_boxer() {
   echo "Creating boxer..."
-  response=$(curl -s -X POST "$BASE_URL/create-boxer" \
+  response=$(curl -s -X POST "$BASE_URL/add-boxer" \
     -H "Content-Type: application/json" \
     -d '{"name": "Ali", "weight": 150, "height": 70, "reach": 75, "age": 30}')
-  echo "$response" | grep -q '"status": "success"'
-  if [ $? -eq 0 ]; then
-    echo "Boxer created."
+
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Boxer created successfully."
+    if [ "$ECHO_JSON" = true ]; then
+      echo "$response" | jq .
+    fi
   else
-    echo "Failed to create boxer."; exit 1
+    echo "Failed to create boxer."
+    echo "$response"
+    exit 1
   fi
 }
 
-get_leaderboard() {
-  echo "Getting leaderboard..."
-  response=$(curl -s "$BASE_URL/leaderboard")
-  echo "$response" | grep -q '"status": "success"'
-  if [ $? -eq 0 ]; then
-    echo "Leaderboard retrieved."
-    [ "$ECHO_JSON" = true ] && echo "$response" | jq .
+get_boxer_by_name() {
+  echo "Retrieving boxer by name..."
+  response=$(curl -s -X GET "$BASE_URL/get-boxer-by-name/Ali")
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Boxer retrieved successfully."
+    if [ "$ECHO_JSON" = true ]; then
+      echo "$response" | jq .
+    fi
   else
-    echo "Failed to get leaderboard."; exit 1
+    echo "Failed to retrieve boxer."
+    echo "$response"
+    exit 1
   fi
 }
 
-run_fight() {
-  echo "Running a fight..."
-  response=$(curl -s -X POST "$BASE_URL/fight")
-  echo "$response" | grep -q '"status": "success"'
-  if [ $? -eq 0 ]; then
-    echo "Fight executed."
-    [ "$ECHO_JSON" = true ] && echo "$response" | jq .
-  else
-    echo "Fight failed."; exit 1
-  fi
-}
-
+# Run tests
 check_health
 check_db
 create_boxer
-create_boxer
-get_leaderboard
-run_fight
+get_boxer_by_name
 
-echo "All smoketests passed!"
+echo "All smoketests passed successfully! "

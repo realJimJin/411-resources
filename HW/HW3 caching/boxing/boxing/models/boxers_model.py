@@ -20,6 +20,13 @@ class Boxers(db.Model):
     manage boxer data, run simulations, and track fight outcomes.
 
     """
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    weight = db.Column(db.Float, nullable=False)
+    height = db.Column(db.Float, nullable=False)
+    reach = db.Column(db.Float, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
 
     def __init__(self, name: str, weight: float, height: float, reach: float, age: int):
         """Initialize a new Boxer instance with basic attributes.
@@ -36,7 +43,14 @@ class Boxers(db.Model):
             - Fight statistics (`fights` and `wins`) are initialized to 0 by default in the database schema.
 
         """
-        pass
+        self.name = name
+        self.weight = weight
+        self.height = height
+        self.reach = reach
+        self.age = age
+        
+    def __repr__(self):
+        return f"Boxer('{self.name}', {self.weight}, {self.height}, {self.reach}, {self.age})"
 
     @classmethod
     def get_weight_class(cls, weight: float) -> str:
@@ -60,33 +74,38 @@ class Boxers(db.Model):
         """
         pass
 
-    @classmethod
-    def create_boxer(cls, name: str, weight: float, height: float, reach: float, age: int) -> None:
-        """Create and persist a new Boxer instance.
+@classmethod
+def create_boxer(cls, name: str, weight: float, height: float, reach: float, age: int) -> None:
+    """Create and persist a new Boxer instance.
 
-        Args:
-            name: The name of the boxer.
-            weight: The weight of the boxer.
-            height: The height of the boxer.
-            reach: The reach of the boxer.
-            age: The age of the boxer.
+    Args:
+        name: The name of the boxer.
+        weight: The weight of the boxer.
+        height: The height of the boxer.
+        reach: The reach of the boxer.
+        age: The age of the boxer.
 
-        Raises:
-            IntegrityError: If a boxer with the same name already exists.
-            ValueError: If the weight is less than 125 or if any of the input parameters are invalid.
-            SQLAlchemyError: If there is a database error during creation.
+    Raises:
+        IntegrityError: If a boxer with the same name already exists.
+        ValueError: If the weight is less than 125 or if any of the input parameters are invalid.
+        SQLAlchemyError: If there is a database error during creation.
 
-        """
-        logger.info(f"Creating boxer: {name}, {weight=} {height=} {reach=} {age=}")
+    """
+    logger.info(f"Creating boxer: {name}, {weight=} {height=} {reach=} {age=}")
 
-        try:
-            logger.info(f"Boxer created successfully: {name}")
-        except IntegrityError:
-            logger.error(f"Boxer with name '{name}' already exists.")
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            logger.error(f"Database error during creation: {e}")
-
+    try:
+        boxer = cls(name=name, weight=weight, height=height, reach=reach, age=age)
+        db.session.add(boxer)
+        db.session.commit()
+        logger.info(f"Boxer created successfully: {name}")
+    except IntegrityError:
+        logger.error(f"Boxer with name '{name}' already exists.")
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error during creation: {e}")
+    except ValueError as e:
+        logger.error(f"Invalid input parameters: {e}")
+        
     @classmethod
     def get_boxer_by_id(cls, boxer_id: int) -> "Boxers":
         """Retrieve a boxer by ID.
@@ -101,9 +120,11 @@ class Boxers(db.Model):
             ValueError: If the boxer with the given ID does not exist.
 
         """
-        if boxer is None:
-            logger.info(f"Boxer with ID {boxer_id} not found.")
-        pass
+    boxer = db.session.query(cls).get(boxer_id)
+    if boxer is None:
+        logger.info(f"Boxer with ID {boxer_id} not found.")
+        raise ValueError(f"Boxer with ID {boxer_id} not found.")
+    return boxer
 
     @classmethod
     def get_boxer_by_name(cls, name: str) -> "Boxers":
@@ -134,13 +155,18 @@ class Boxers(db.Model):
             ValueError: If the boxer with the given ID does not exist.
 
         """
-        boxer = cls.get_boxer_by_id(boxer_id)
-        if boxer is None:
-            logger.info(f"Boxer with ID {boxer_id} not found.")
-            raise ValueError(f"Boxer with ID {boxer_id} not found.")
-        db.session.delete(boxer)
-        db.session.commit()
-        logger.info(f"Boxer with ID {boxer_id} permanently deleted.")
+        try:
+            boxer = cls.get_boxer_by_id(boxer_id)
+            db.session.delete(boxer)
+            db.session.commit()
+            logger.info(f"Boxer with ID {boxer_id} deleted successfully.")
+        except ValueError as e:
+            logger.error(f"Error deleting boxer: {e}")
+            raise
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            logger.error(f"Database error during deletion: {e}")
+            raise
 
     def update_stats(self, result: str) -> None:
         """Update the boxer's fight and win count based on result.
@@ -153,18 +179,23 @@ class Boxers(db.Model):
             ValueError: If the number of wins exceeds the number of fights.
 
         """
-        if result not in {"win", "loss"}:
-            raise ValueError("Result must be 'win' or 'loss'.")
-
-        self.fights += 1
-        if result == "win":
-            self.wins += 1
-
-        if self.wins > self.fights:
-            raise ValueError("Wins cannot exceed number of fights.")
-
+    try:
+        boxer = cls.get_boxer_by_id(boxer_id)
+        for key, value in kwargs.items():
+            if hasattr(boxer, key):
+                setattr(boxer, key, value)
+            else:
+                logger.error(f"Invalid attribute: {key}")
+                raise ValueError(f"Invalid attribute: {key}")
         db.session.commit()
-        logger.info(f"Updated stats for boxer {self.name}: {self.fights} fights, {self.wins} wins.")
+        logger.info(f"Boxer with ID {boxer_id} updated successfully.")
+    except ValueError as e:
+        logger.error(f"Error updating boxer: {e}")
+        raise
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        logger.error(f"Database error during update: {e}")
+        raise
 
     @staticmethod
     def get_leaderboard(sort_by: str = "wins") -> List[dict]:

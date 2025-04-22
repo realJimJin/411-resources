@@ -4,7 +4,7 @@ import os
 import time
 from typing import List
 
-from boxing.models.boxers_model import Boxers, update_boxer_stats
+from boxing.models.boxers_model import Boxers
 from boxing.utils.logger import configure_logger
 from boxing.utils.api_utils import get_random
 

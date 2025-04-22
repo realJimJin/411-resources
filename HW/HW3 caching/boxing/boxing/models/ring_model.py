@@ -149,16 +149,15 @@ class RingModel:
             if boxer_id in self._boxer_cache and self._ttl.get(boxer_id, 0) > now:
                 boxer = self._boxer_cache[boxer_id]
                 logger.debug(f"Using cached boxer {boxer_id} (TTL valid).")
-            else:
-                try:
-                    boxer = Boxers.get_boxer_by_id(boxer_id)
-                    logger.info(f"Boxer ID {boxer_id} loaded from DB.")
-                except ValueError as e:
-                    logger.error(f"Boxer ID {boxer_id} not found in DB: {e}")
-                    raise ValueError(f"Boxer ID {boxer_id} not found in database") from e
+            try:
+                boxer = Boxers.get_boxer_by_id(boxer_id)
+                logger.info(f"Boxer ID {boxer_id} loaded from DB.")
+            except ValueError as e:
+                logger.error(f"Boxer ID {boxer_id} not found in DB: {e}")
+                raise ValueError(f"Boxer ID {boxer_id} not found in database") from e
 
-                self._boxer_cache[boxer_id] = boxer
-                self._ttl[boxer_id] = now + self.ttl_seconds
+            self._boxer_cache[boxer_id] = boxer
+            self._ttl[boxer_id] = now + self.ttl_seconds
 
             boxers.append(boxer)
 
@@ -194,4 +193,9 @@ class RingModel:
         """Clears the local TTL cache of boxer objects.
 
         """
+        if not self._boxer_cache and not self.ttl:
+            logger.warning("Cache and TTl are empty")
+
         logger.info("Clearing local boxer cache in RingModel.")
+        self._boxer_cache.clear()
+        self._ttl.clear()

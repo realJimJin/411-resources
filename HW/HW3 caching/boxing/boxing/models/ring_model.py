@@ -4,7 +4,7 @@ import os
 import time
 from typing import List
 
-from boxing.models.boxers_model import Boxers, update_stats
+from boxing.models.boxers_model import Boxers, update_boxer_stats
 from boxing.utils.logger import configure_logger
 from boxing.utils.api_utils import get_random
 
@@ -96,12 +96,9 @@ class RingModel:
         """Clears the list of boxers.
 
         """
-        try:
-            if self.check_if_empty():
-                pass
-        except ValueError:
-            logger.warning("Clearing an empty playlist")
-
+        if not self.ring:
+            logger.warning("Attempted to clear an empty ring.")
+            return
         logger.info("Clearing the boxers from the ring.")
         self.ring.clear()
 
@@ -153,11 +150,16 @@ class RingModel:
                 boxer = self._boxer_cache[boxer_id]
                 logger.debug(f"Using cached boxer {boxer_id} (TTL valid).")
             else:
-                boxer = Boxers.get_boxer_by_id(boxer_id)
+                try:
+                    boxer = Boxers.get_boxer_by_id(boxer_id)
+                    logger.info(f"Boxer ID {boxer_id} loaded from DB.")
+                except ValueError as e:
+                    logger.error(f"Boxer ID {boxer_id} not found in DB: {e}")
+                    raise ValueError(f"Boxer ID {boxer_id} not found in database") from e
+
                 self._boxer_cache[boxer_id] = boxer
-                self._ttl[boxer_id] = now + 60
-                logger.info(f"TTL expired or missing for boxer {boxer_id}. Refreshing from DB.")
-        
+                self._ttl[boxer_id] = now + self.ttl_seconds
+
             boxers.append(boxer)
 
         logger.info(f"Retrieved {len(boxers)} boxers from the ring.")
@@ -192,11 +194,4 @@ class RingModel:
         """Clears the local TTL cache of boxer objects.
 
         """
-        try:
-            if self.check_if_empty():
-                pass
-        except ValueError:
-            logger.warning("Clearing an empty ring")
-
-        self.ring.clear()
         logger.info("Clearing local boxer cache in RingModel.")

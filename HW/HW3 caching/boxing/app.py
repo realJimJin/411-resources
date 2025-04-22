@@ -30,7 +30,12 @@ def create_app(config_class=ProductionConfig):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return Users.query.filter_by(username=user_id).first()
+        # user_id comes in as the string returned by get_id(), so cast back to int
+        try:
+            uid = int(user_id)
+        except (TypeError, ValueError):
+            return None
+        return Users.query.get(uid)
 
     @login_manager.unauthorized_handler
     def unauthorized():

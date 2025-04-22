@@ -8,12 +8,17 @@ from sqlalchemy.exc import IntegrityError
 from boxing.db import db
 from boxing.utils.logger import configure_logger
 
-
 logger = logging.getLogger(__name__)
 configure_logger(logger)
 
+class Users(db.Model, UserMixin):
+    __tablename__ = "users"
 
-class Users():
+    # Columns
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    salt = db.Column(db.String(32), nullable=False)
+    password = db.Column(db.String(64), nullable=False)
 
     @staticmethod
     def _generate_hashed_password(password: str) -> tuple[str, str]:

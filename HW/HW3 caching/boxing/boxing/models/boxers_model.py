@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from boxing.db import db
 from boxing.utils.logger import configure_logger
@@ -74,9 +74,9 @@ class Boxers(db.Model):
         """
         pass
 
-@classmethod
-def create_boxer(cls, name: str, weight: float, height: float, reach: float, age: int) -> None:
-    """Create and persist a new Boxer instance.
+    @classmethod
+    def create_boxer(cls, name: str, weight: float, height: float, reach: float, age: int) -> None:
+        """Create and persist a new Boxer instance.
 
     Args:
         name: The name of the boxer.
@@ -91,20 +91,20 @@ def create_boxer(cls, name: str, weight: float, height: float, reach: float, age
         SQLAlchemyError: If there is a database error during creation.
 
     """
-    logger.info(f"Creating boxer: {name}, {weight=} {height=} {reach=} {age=}")
+        logger.info(f"Creating boxer: {name}, {weight=} {height=} {reach=} {age=}")
 
-    try:
-        boxer = cls(name=name, weight=weight, height=height, reach=reach, age=age)
-        db.session.add(boxer)
-        db.session.commit()
-        logger.info(f"Boxer created successfully: {name}")
-    except IntegrityError:
-        logger.error(f"Boxer with name '{name}' already exists.")
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        logger.error(f"Database error during creation: {e}")
-    except ValueError as e:
-        logger.error(f"Invalid input parameters: {e}")
+        try:
+            boxer = cls(name=name, weight=weight, height=height, reach=reach, age=age)
+            db.session.add(boxer)
+            db.session.commit()
+            logger.info(f"Boxer created successfully: {name}")
+        except IntegrityError:
+            logger.error(f"Boxer with name '{name}' already exists.")
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            logger.error(f"Database error during creation: {e}")
+        except ValueError as e:
+            logger.error(f"Invalid input parameters: {e}")
         
     @classmethod
     def get_boxer_by_id(cls, boxer_id: int) -> "Boxers":
@@ -120,11 +120,11 @@ def create_boxer(cls, name: str, weight: float, height: float, reach: float, age
             ValueError: If the boxer with the given ID does not exist.
 
         """
-    boxer = db.session.query(cls).get(boxer_id)
-    if boxer is None:
-        logger.info(f"Boxer with ID {boxer_id} not found.")
-        raise ValueError(f"Boxer with ID {boxer_id} not found.")
-    return boxer
+        boxer = db.session.query(cls).get(boxer_id)
+        if boxer is None:
+            logger.info(f"Boxer with ID {boxer_id} not found.")
+            raise ValueError(f"Boxer with ID {boxer_id} not found.")
+        return boxer
 
     @classmethod
     def get_boxer_by_name(cls, name: str) -> "Boxers":

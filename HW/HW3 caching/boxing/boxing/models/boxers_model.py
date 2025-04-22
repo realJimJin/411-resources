@@ -43,11 +43,23 @@ class Boxers(db.Model):
             - Fight statistics (`fights` and `wins`) are initialized to 0 by default in the database schema.
 
         """
+        if weight < 125:
+            raise ValueError("Weight must be at least 125 pounds.")
+        if height <= 0:
+            raise ValueError("Height must be greater than 0 inches.")
+        if reach <= 0:
+            raise ValueError("Reach must be greater than 0 inches.")
+        if not (18 <= age <= 40):
+            raise ValueError("Age must be between 18 and 40, inclusive.")
+        
         self.name = name
         self.weight = weight
         self.height = height
         self.reach = reach
         self.age = age
+
+        self.fights = 0
+        self.wins = 0
         
     def __repr__(self):
         return f"Boxer('{self.name}', {self.weight}, {self.height}, {self.reach}, {self.age})"
@@ -179,23 +191,36 @@ class Boxers(db.Model):
             ValueError: If the number of wins exceeds the number of fights.
 
         """
-    try:
-        boxer = cls.get_boxer_by_id(boxer_id)
-        for key, value in kwargs.items():
-            if hasattr(boxer, key):
-                setattr(boxer, key, value)
-            else:
-                logger.error(f"Invalid attribute: {key}")
-                raise ValueError(f"Invalid attribute: {key}")
+
+        #try:
+        #    boxer = cls.get_boxer_by_id(boxer_id)
+        #    for key, value in kwargs.items():
+        #        if hasattr(boxer, key):
+        #            setattr(boxer, key, value)
+        #        else:
+        #            logger.error(f"Invalid attribute: {key}")
+        #            raise ValueError(f"Invalid attribute: {key}")
+        #    db.session.commit()
+        #    logger.info(f"Boxer with ID {boxer_id} updated successfully.")
+        #except ValueError as e:
+        #    logger.error(f"Error updating boxer: {e}")
+        #    raise
+        #except SQLAlchemyError as e:
+        #    db.session.rollback()
+        #    logger.error(f"Database error during update: {e}")
+        #    raise
+        if result not in {"win", "loss"}:
+            raise ValueError("Result must be 'win' or 'loss'.")
+
+        self.fights += 1
+        if result == "win":
+            self.wins += 1
+
+        if self.wins > self.fights:
+            raise ValueError("Wins cannot exceed number of fights.")
+
         db.session.commit()
-        logger.info(f"Boxer with ID {boxer_id} updated successfully.")
-    except ValueError as e:
-        logger.error(f"Error updating boxer: {e}")
-        raise
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        logger.error(f"Database error during update: {e}")
-        raise
+        logger.info(f"Updated stats for boxer {self.name}: {self.fights} fights, {self.wins} wins.")
 
     @staticmethod
     def get_leaderboard(sort_by: str = "wins") -> List[dict]:

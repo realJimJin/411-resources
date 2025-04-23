@@ -154,8 +154,9 @@ class RingModel:
 
         for boxer_id in self.ring:
             if boxer_id in self._boxer_cache and self._ttl.get(boxer_id, 0) > now:
-                boxer = self._boxer_cache[boxer_id]
                 logger.debug(f"Using cached boxer {boxer_id} (TTL valid).")
+                boxers.append(self._boxer_cache[boxer_id])
+                continue
             try:
                 boxer = Boxers.get_boxer_by_id(boxer_id)
                 logger.info(f"Boxer ID {boxer_id} loaded from DB.")

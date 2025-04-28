@@ -30,12 +30,19 @@ class RingModel:
             ttl_seconds (int): The time-to-live in seconds for the cached boxer objects.
 
         """
+<<<<<<< HEAD
         self.ring: List[Boxers] = []
         self._boxer_cache: dict[int, Boxers] = {}
         self._ttl: dict[int, float] = {}
         self.ttl_seconds = int(os.getenv("TTL", 60))
 
 
+=======
+        self.ring: List[int] = []
+        self._boxer_cache: dict[int, Boxers] = {}
+        self._ttl: dict[int, float] = {}
+        self.ttl_seconds = int(os.getenv("TTL", 60))
+>>>>>>> upstream/solutions
 
     def fight(self) -> str:
         """Simulates a fight between two combatants.
@@ -118,7 +125,11 @@ class RingModel:
 
         if len(self.ring) >= 2:
             logger.error(f"Attempted to add boxer ID {boxer_id} but the ring is full")
+<<<<<<< HEAD
             raise ValueError("Ring is full")
+=======
+            raise ValueError("Ring is full, cannot add more boxers.")
+>>>>>>> upstream/solutions
 
         try:
             boxer = Boxers.get_boxer_by_id(boxer_id)
@@ -128,8 +139,12 @@ class RingModel:
 
         logger.info(f"Adding boxer '{boxer.name}' (ID {boxer_id}) to the ring")
 
+<<<<<<< HEAD
         if boxer_id in self.ring:
             logger.warning(f"Boxer ID {boxer_id} is already in ring")
+=======
+        self.ring.append(boxer_id)
+>>>>>>> upstream/solutions
 
         logger.info(f"Current boxers in the ring: {[Boxers.get_boxer_by_id(b).name for b in self.ring]}")
         self.ring.append(boxer_id)
@@ -151,6 +166,7 @@ class RingModel:
         else:
             logger.info(f"Retrieving {len(self.ring)} boxers from the ring.")
 
+<<<<<<< HEAD
 
         for boxer_id in self.ring:
             if boxer_id in self._boxer_cache and self._ttl.get(boxer_id, 0) > now:
@@ -168,8 +184,24 @@ class RingModel:
             self._ttl[boxer_id] = now + self.ttl_seconds
 
             boxers.append(boxer)
+=======
+        now = time.time()
+        boxers: List[Boxers] = []
+
+        for boxer_id in self.ring:
+            expired = boxer_id not in self._ttl or now > self._ttl[boxer_id]
+            if expired:
+                logger.info(f"TTL expired or missing for boxer {boxer_id}. Refreshing from DB.")
+                boxer = Boxers.get_boxer_by_id(boxer_id)
+                self._boxer_cache[boxer_id] = boxer
+                self._ttl[boxer_id] = now + self.ttl_seconds
+            else:
+                logger.debug(f"Using cached boxer {boxer_id} (TTL valid).")
+            boxers.append(self._boxer_cache[boxer_id])
+>>>>>>> upstream/solutions
 
         logger.info(f"Retrieved {len(boxers)} boxers from the ring.")
+        return boxers
 
         return boxers
 

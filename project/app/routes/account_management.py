@@ -51,3 +51,19 @@ def update_password():
     user.set_password(new_password)
     db.session.commit()
     return jsonify({'message': 'Password updated successfully'}), 200
+
+@account_mgmt_bp.route('/delete-account', methods=['DELETE'])
+def delete_account():
+    if 'username' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    user = User.query.filter_by(username=session['username']).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        session.pop('username', None)
+        return jsonify({'message': 'Account deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400

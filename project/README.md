@@ -136,20 +136,68 @@ Users can save, view, and edit their favorite spots with an interactive version 
 * Request Type: GET
 * Purpose: List all favorite locations for the user
 * Response Format: JSON (list)
+* Example Response:
+```
+[
+  {
+    "id": 1,
+    "name": "Fenway Park",
+    "lat": 42.3467,
+    "lng": -71.0972,
+    "description": "Baseball stadium in Boston"
+  },
+  ...
+]
+```
 
 ### /locations/<id>
 * Request Type: GET
 * Purpose: Get details for a specific location
 * Response Format: JSON
+* Example Response:
+```
+{
+  "id": 1,
+  "name": "Fenway Park",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Baseball stadium in Boston"
+}
+```
 
 * Request Type: PUT
 * Purpose: Update a location
 * Request Body: Any updatable field (name, lat, lng, description)
 * Response Format: JSON
+* Example Request:
+```
+{
+  "name": "Fenway Park Updated",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Updated description"
+}
+```
+* Example Response:
+```
+{
+  "id": 1,
+  "name": "Fenway Park Updated",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Updated description"
+}
+```
 
 * Request Type: DELETE
 * Purpose: Delete a location
 * Response Format: JSON
+* Example Response:
+```
+{
+  "message": "Location deleted successfully"
+}
+```
 
 ### /healthcheck
 * Request Type: GET

@@ -1,142 +1,232 @@
 # Waypoint
-Description: Users can save, view, and edit their favorite spots with an interactive version of Google Maps. 
 
-## Routes: 
-/login: 
-* Request Type: GET
-* Purpose: Login with an existing username and password
-* Request Body:
-  - username (String): Existing username.
-  - password (String): Existing password (tied to the user).
+## Description
+Users can save, view, and edit their favorite spots with an interactive version of Google Maps.
 
-* Response Format: JSON
-* Success Response Example:
+## Setup
+1. Install dependencies: `pip install -r requirements.txt`
+2. Run the app: `python -m app.main`
+
+## Routes
+
+---
+
+### /login
+* **Request Type:** POST
+* **Purpose:** Login with an existing username and password
+* **Request Body:**
+```json
+{
+  "username": "user123",
+  "password": "securepassword"
+}
+```
+* **Response Format:** JSON
+* **Success Response Example:**
   - Code: 200
   - Content:
+```json
+{
+  "message": "Login successful"
+}
+```
 
-        {
+---
 
-            "message": "Account logged in successfully"
-
-        }
-* Example Request:'
-  
-        {
-            "username": "user123",
-            "password": "securepassword"
-
-        }
-* Example Response:
-  
-        {
-                "message": "Account logged in successfully",
-                "status": "200"
-        }
-/logout: 
-
-
-/create-account: 
-* Request Type: POST
-* Purpose: Creates a new user account with a username and password.
-* Request Body:
-  - username (String): Existing username.
-  - password (String): Existing password (tied to the user).
-  - newPassword (String): New password 
-* Response Format: JSON
-* Success Response Example:
+### /logout
+* **Request Type:** POST
+* **Purpose:** Log out the current user
+* **Response Format:** JSON
+* **Success Response Example:**
   - Code: 200
   - Content:
-  
-        {
-            "message": "Account created successfully"
-        }
-* Example Request:
- 
-        {
-                "username": "newuser123",
-                "password": "securepassword"
+```json
+{
+  "message": "Logged out successfully"
+}
+```
 
-        }
-  
-* Example Response:
-  
-        {
-                "message": "Account created successfully",
-                "status": "200"
-        }
+---
 
-/update-password: 
-* Request Type: PATCH
-* Purpose: Change password for existing account.
-* Request Body:
-  - username (String): Existing username.
-  - password (String): Current password.
-  - newPassword (String): User’s new Password 
-* Response Format: JSON
-* Success Response Example:
-  - Code: 200
-  -Content:
+### /create-account
+* **Request Type:** POST
+* **Purpose:** Create a new user account
+* **Request Body:**
+```json
+{
+  "username": "newuser123",
+  "password": "securepassword"
+}
+```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 201
+  - Content:
+```json
+{
+  "message": "Account created successfully"
+}
+```
 
-        {
-                "message": "Account password updated successfully"
-        }
-    
-* Example Request:
-  
-        {
-                "username": "newuser123",
-                "password": "securepassword"
-                "newPassword": "securepassword2"
-        }
-  
-* Example Response:
-  
-        {
-                "message": "Account password changed successfully",
-        }
+---
 
-/delete-account:
-* Request Type: Delete
-* Purpose: Deletes the account from the username and password
-* Request Body:
-  - username (String): Existing username.
-  - password (String): Existing password (tied to the user).
-* Response Format: JSON
-* Success Response Example:
+### /update-password
+* **Request Type:** POST
+* **Purpose:** Change password for existing account
+* **Request Body:**
+```json
+{
+  "new_password": "securepassword2"
+}
+```
+* **Response Format:** JSON
+* **Success Response Example:**
   - Code: 200
   - Content:
+```json
+{
+  "message": "Password updated successfully"
+}
+```
 
-        {
-                "message": "Account deleted successfully"
-        }
+---
 
-* Example Request:
+### /delete-account
+* **Request Type:** DELETE
+* **Purpose:** Delete the account for the logged-in user
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
+{
+  "message": "Account deleted successfully"
+}
+```
 
-        {
-                "username": "newuser123",
-                "password": "securepassword"
-        }
-* Example Response:
+---
 
-        {
-                "message": "Account deleted successfully",
-                "status": "200"
-        }
+### /locations
+* **Request Type:** POST
+* **Purpose:** Add a new favorite location
+* **Request Body:**
+```json
+{
+  "name": "Fenway Park",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Baseball stadium in Boston"
+}
+```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 201
+  - Content:
+```json
+{
+  "id": 1,
+  "name": "Fenway Park",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Baseball stadium in Boston"
+}
+```
 
-/healthcheck:
+* **Request Type:** GET
+* **Purpose:** List all favorite locations for the user
+* **Response Format:** JSON (list)
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
+[
+  {
+    "id": 1,
+    "name": "Fenway Park",
+    "lat": 42.3467,
+    "lng": -71.0972,
+    "description": "Baseball stadium in Boston"
+  },
+  ...
+]
+```
 
-What the application does at a high level
-A description of each route (example on ed discussion):	
-Route Name and Path
-Request Type
-GET, POST, PUT, DELETE
-Purpose
-Request Format
-GET parameters
-POST / PUT / DELETE body
-Response Format
-JSON keys and value types	
-Example
-Request in the form of JSON body or cURL command
-Associated JSON response
+---
 
+### /locations/<id>
+* **Request Type:** GET
+* **Purpose:** Get details for a specific location
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
+{
+  "id": 1,
+  "name": "Fenway Park",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Baseball stadium in Boston"
+}
+```
+
+* **Request Type:** PUT
+* **Purpose:** Update a location
+* **Request Body:**
+```json
+{
+  "name": "Fenway Park Updated",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Updated description"
+}
+```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
+{
+  "id": 1,
+  "name": "Fenway Park Updated",
+  "lat": 42.3467,
+  "lng": -71.0972,
+  "description": "Updated description"
+}
+```
+
+* **Request Type:** DELETE
+* **Purpose:** Delete a location
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
+{
+  "message": "Location deleted successfully"
+}
+```
+
+---
+
+### /healthcheck
+* **Request Type:** GET
+* **Purpose:** Check if the application is running
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+## Testing
+- To run tests: `pytest tests/`
+
+## Notes
+- Fill in your Google Maps API key in `.env` before using geocoding features.
+- All endpoints return JSON and require authentication except `/create-account`, `/login`, `/healthcheck`.

@@ -11,110 +11,108 @@ Users can save, view, and edit their favorite spots with an interactive version 
 
 ## Routes
 
+---
+
 ### /login
-* Request Type: POST
-* Purpose: Login with an existing username and password
-* Request Body:
-  - username (String): Existing username.
-  - password (String): Existing password.
-* Response Format: JSON
-* Example Request:
-```
+* **Request Type:** POST
+* **Purpose:** Login with an existing username and password
+* **Request Body:**
+```json
 {
   "username": "user123",
   "password": "securepassword"
 }
 ```
-* Example Response:
-```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "message": "Login successful"
 }
 ```
 
+---
+
 ### /logout
-* Request Type: POST
-* Purpose: Log out the current user
-* Response Format: JSON
-* Example Response:
-```
+* **Request Type:** POST
+* **Purpose:** Log out the current user
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "message": "Logged out successfully"
 }
 ```
 
+---
+
 ### /create-account
-* Request Type: POST
-* Purpose: Create a new user account
-* Request Body:
-  - username (String)
-  - password (String)
-* Response Format: JSON
-* Example Request:
-```
+* **Request Type:** POST
+* **Purpose:** Create a new user account
+* **Request Body:**
+```json
 {
   "username": "newuser123",
   "password": "securepassword"
 }
 ```
-* Example Response:
-```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 201
+  - Content:
+```json
 {
   "message": "Account created successfully"
 }
 ```
 
+---
+
 ### /update-password
-* Request Type: POST
-* Purpose: Change password for existing account
-* Request Body:
-  - new_password (String)
-* Response Format: JSON
-* Example Request:
-```
+* **Request Type:** POST
+* **Purpose:** Change password for existing account
+* **Request Body:**
+```json
 {
   "new_password": "securepassword2"
 }
 ```
-* Example Response:
-```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "message": "Password updated successfully"
 }
 ```
 
+---
+
 ### /delete-account
-* Request Type: DELETE
-* Purpose: Delete the account (not implemented in code above, add if needed)
-* Request Body:
-  - username (String)
-  - password (String)
-* Response Format: JSON
-* Example Request:
-```
-{
-  "username": "newuser123",
-  "password": "securepassword"
-}
-```
-* Example Response:
-```
+* **Request Type:** DELETE
+* **Purpose:** Delete the account for the logged-in user
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "message": "Account deleted successfully"
 }
 ```
 
+---
+
 ### /locations
-* Request Type: POST
-* Purpose: Add a new favorite location
-* Request Body:
-  - name (String)
-  - lat (float)
-  - lng (float)
-  - description (String, optional)
-* Response Format: JSON
-* Example Request:
-```
+* **Request Type:** POST
+* **Purpose:** Add a new favorite location
+* **Request Body:**
+```json
 {
   "name": "Fenway Park",
   "lat": 42.3467,
@@ -122,8 +120,11 @@ Users can save, view, and edit their favorite spots with an interactive version 
   "description": "Baseball stadium in Boston"
 }
 ```
-* Example Response:
-```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 201
+  - Content:
+```json
 {
   "id": 1,
   "name": "Fenway Park",
@@ -133,11 +134,13 @@ Users can save, view, and edit their favorite spots with an interactive version 
 }
 ```
 
-* Request Type: GET
-* Purpose: List all favorite locations for the user
-* Response Format: JSON (list)
-* Example Response:
-```
+* **Request Type:** GET
+* **Purpose:** List all favorite locations for the user
+* **Response Format:** JSON (list)
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 [
   {
     "id": 1,
@@ -150,12 +153,16 @@ Users can save, view, and edit their favorite spots with an interactive version 
 ]
 ```
 
+---
+
 ### /locations/<id>
-* Request Type: GET
-* Purpose: Get details for a specific location
-* Response Format: JSON
-* Example Response:
-```
+* **Request Type:** GET
+* **Purpose:** Get details for a specific location
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "id": 1,
   "name": "Fenway Park",
@@ -165,12 +172,10 @@ Users can save, view, and edit their favorite spots with an interactive version 
 }
 ```
 
-* Request Type: PUT
-* Purpose: Update a location
-* Request Body: Any updatable field (name, lat, lng, description)
-* Response Format: JSON
-* Example Request:
-```
+* **Request Type:** PUT
+* **Purpose:** Update a location
+* **Request Body:**
+```json
 {
   "name": "Fenway Park Updated",
   "lat": 42.3467,
@@ -178,8 +183,11 @@ Users can save, view, and edit their favorite spots with an interactive version 
   "description": "Updated description"
 }
 ```
-* Example Response:
-```
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "id": 1,
   "name": "Fenway Park Updated",
@@ -189,22 +197,28 @@ Users can save, view, and edit their favorite spots with an interactive version 
 }
 ```
 
-* Request Type: DELETE
-* Purpose: Delete a location
-* Response Format: JSON
-* Example Response:
-```
+* **Request Type:** DELETE
+* **Purpose:** Delete a location
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "message": "Location deleted successfully"
 }
 ```
 
+---
+
 ### /healthcheck
-* Request Type: GET
-* Purpose: Check if the application is running
-* Response Format: JSON
-* Example Response:
-```
+* **Request Type:** GET
+* **Purpose:** Check if the application is running
+* **Response Format:** JSON
+* **Success Response Example:**
+  - Code: 200
+  - Content:
+```json
 {
   "status": "ok"
 }

@@ -10,6 +10,8 @@ from boxing.models.boxers_model import Boxers
 from boxing.models.ring_model import RingModel
 from boxing.models.user_model import Users
 from boxing.utils.logger import configure_logger
+from boxing.models.favorites_model import Favorite
+
 
 
 load_dotenv()
@@ -733,6 +735,70 @@ def create_app(config_class=ProductionConfig):
                 "details": str(e)
             }), 500)
 
+    @app.route('/api/add-favorite', methods=['POST'])
+    @login_required
+    def add_favorite():
+        data = request.get_json()
+        name = data.get("name")
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
+        description = data.get("description", "")
+
+        if not name or latitude is None or longitude is None:
+            return jsonify({"status": "error", "message": "Missing required fields"}), 400
+
+        favorite = Favorite(
+            user_id=current_user.id,
+            name=name,
+            latitude=latitude,
+            longitude=longitude,
+            description=description
+        )
+        db.session.add(favorite)
+        db.session.commit()
+
+        return jsonify({"status": "success", "favorite": favorite.to_dict()}), 201
+
+    @app.route('/api/favorites', methods=['GET'])
+    @login_required
+    def get_favorites():
+        favorites = Favorite.query.filter_by(user_id=current_user.id).all()
+        favorites_list = [fav.to_dict() for fav in favorites]
+
+        return jsonify({"status": "success", "favorites": favorites_list}), 200
+
+    @app.route('/api/favorite/<int:favorite_id>', methods=['PUT'])
+    @login_required
+    def update_favorite(favorite_id):
+        favorite = Favorite.query.filter_by(id=favorite_id, user_id=current_user.id).first()
+
+        if not favorite:
+            return jsonify({"status": "error", "message": "Favorite not found"}), 404
+
+        data = request.get_json()
+        favorite.name = data.get("name", favorite.name)
+        favorite.latitude = data.get("latitude", favorite.latitude)
+        favorite.longitude = data.get("longitude", favorite.longitude)
+        favorite.description = data.get("description", favorite.description)
+
+        db.session.commit()
+
+        return jsonify({"status": "success", "favorite": favorite.to_dict()}), 200
+
+    @app.route('/api/favorite/<int:favorite_id>', methods=['DELETE'])
+    @login_required
+    def delete_favorite(favorite_id):
+        favorite = Favorite.query.filter_by(id=favorite_id, user_id=current_user.id).first()
+
+        if not favorite:
+            return jsonify({"status": "error", "message": "Favorite not found"}), 404
+
+        db.session.delete(favorite)
+        db.session.commit()
+
+        return jsonify({"status": "success", "message": "Favorite deleted"}), 200
+
+
     return app
 
 
@@ -740,7 +806,7 @@ if __name__ == '__main__':
     app = create_app()
     app.logger.info("Starting Flask app...")
     try:
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        app.run(debug=True, host='0.0.0.0', port=5001)
     except Exception as e:
         app.logger.error(f"Flask app encountered an error: {e}")
     finally:

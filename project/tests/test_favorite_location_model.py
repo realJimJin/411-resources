@@ -28,7 +28,6 @@ def test_add_location(fav_model, sample_location_data):
     assert loc.user == sample_location_data["user"]
     assert loc.loc_id == 1  
 
-
 # Get Location
 
 def test_get_location_existing(fav_model, sample_location_data):
@@ -39,7 +38,8 @@ def test_get_location_existing(fav_model, sample_location_data):
 
 def test_get_location_nonexistent(fav_model):
     """Test retrieving a non-existent favorite location."""
-    assert fav_model.get_location(999) is None
+    with pytest.raises(ValueError, match="not found"):
+        fav_model.get_location(999)
 
 
 # Get All Locations
@@ -60,6 +60,7 @@ def test_get_all_locations_for_user(fav_model, sample_location_data):
     assert user_locations[0].user == "testuser"
 
 
+
 # Update Location
 
 def test_update_location_existing(fav_model, sample_location_data):
@@ -71,9 +72,8 @@ def test_update_location_existing(fav_model, sample_location_data):
 
 def test_update_location_nonexistent(fav_model):
     """Test updating a non-existent location."""
-    updated = fav_model.update_location(999, name="Doesn't matter")
-    assert updated is None
-
+    with pytest.raises(ValueError, match="not found"):
+        fav_model.update_location(9999)
 
 # Delete Location
 

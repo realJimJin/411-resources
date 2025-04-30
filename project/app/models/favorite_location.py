@@ -1,5 +1,4 @@
 import logging
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.utils.logger import configure_logger
 
 
@@ -44,38 +43,25 @@ class FavoriteLocationModel:
 
         Args:
             loc_id (int): The locations's ID. Must be unique.
-            name (str): Name of location. Must be unique
+            name (str): Name of location. 
             lat (float): Latitude of location
             lng (float): Longitide of location
             description (str): Short description of chosen location
             user (str):  user of the user who saved it
 
         Returns:
-            loc (Favorite_Location): New favorite location
-
-        Raises:
-            IntegrityError: If a boxer with the same name already exists.
-            SQLAlchemyError: If there is a database error during creation.
+            loc (Favorite_Location): Created favorite location.
 
         """
         logger.info(f"Creating Location: {name}, {lat=} {lng=} {description=} {user=}")
-        try:
-            loc = FavoriteLocation(self.next_id, name, lat, lng, description, user)
-            self.locations[self.next_id] = loc
-            self.next_id += 1
-            logger.info(f"Location created successfully")
-            return loc
-        except IntegrityError:
-            db.session.rollback()
-            logger.error(f"Location with name '{name}' already exists.")
-            raise ValueError(f"Location with name '{name}' already exists.")
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            logger.error(f"Database error during creation: {e}")
-            raise
+        
+        loc = FavoriteLocation(self.next_id, name, lat, lng, description, user)
+        self.locations[self.next_id] = loc
+        self.next_id += 1
+        return loc
 
 
-    def get_location(cls, loc_id):
+    def get_location(self, loc_id):
         """Retrieve a location by ID.
 
         Args:
@@ -88,7 +74,9 @@ class FavoriteLocationModel:
             ValueError: If the location with the given ID does not exist.
 
         """        
-        location = cls.locations.get(loc_id)
+        logger.info(f"Looking for location with ID: {loc_id}")
+
+        location = self.locations.get(loc_id)
         if location is None:
             logger.info(f"Location with ID {loc_id} not found.")
             raise ValueError(f"Location with ID {loc_id} not found.")
@@ -107,14 +95,15 @@ class FavoriteLocationModel:
             ValueError: If given user does not exist.
 
         """ 
-        if user is None:
-            logger.info(f"User with name {user} not found.")
-            raise ValueError(f"User with name {user} not found.")
+        logger.info(f"Attempting to get all locations {user}")
+
+        if list(self.locations.values()) == None:
+            logger.warning("No locations")
         if user:
             return [l for l in self.locations.values() if l.user == user]
         return list(self.locations.values())
 
-    def update_location(cls, loc_id, **kwargs):
+    def update_location(self, loc_id, **kwargs):
         """Update the location
 
         Args:
@@ -124,7 +113,7 @@ class FavoriteLocationModel:
             ValueError: Location ID does not exist
 
         """
-        location = cls.locations.get(loc_id)
+        location = self.locations.get(loc_id)
         if location is None:
             logger.info(f"Location with ID {loc_id} not found.")
             raise ValueError(f"Location with ID {loc_id} not found.")
@@ -134,7 +123,7 @@ class FavoriteLocationModel:
                 setattr(location, k, v)
         return location
 
-    def delete_location(cls, loc_id):
+    def delete_location(self, loc_id):
         """Delete a location by ID.
 
         Args:
@@ -144,17 +133,11 @@ class FavoriteLocationModel:
             ValueError: If the location with the given ID does not exist.
 
         """
-        try:
-            location = cls.locations.pop(loc_id, None)
-            db.session.delete(location)
-            db.session.commit()
-            logger.info(f"Location with ID {loc_id} deleted successfully.")
-        except ValueError as e:
-            logger.error(f"Error deleting location: {e}")
-            raise
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            logger.error(f"Database error during deletion: {e}")
-            raise
+
+        location = self.locations.get(loc_id)
+        if location is None:
+            logger.info(f"Location with ID {loc_id} not found.")
+            raise ValueError(f"Location with ID {loc_id} not found.")
+        return self.locations.pop(loc_id, None)
 
 favorite_locations_model = FavoriteLocationModel()

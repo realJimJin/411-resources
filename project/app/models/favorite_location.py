@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from project.utils.logger import configure_logger
+from app.utils.logger import configure_logger
 
 
 logger = logging.getLogger(__name__)

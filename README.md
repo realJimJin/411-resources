@@ -1,5 +1,5 @@
 # Waypoint
-
+![alt text](WaypointLogo.png)
 ## Description
 Users can save, view, and edit their favorite spots with an interactive version of Google Maps.
 
